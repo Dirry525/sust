@@ -1,0 +1,43 @@
+import timeit
+import numpy
+
+
+
+def quicksort(arr: list[int]) -> list:
+
+    length = len(arr)
+
+    if length <= 1:
+        return arr
+
+    pivot = arr[length // 2]
+
+    left: list = [x for x in arr if x < pivot]
+
+    mid = [x for x in arr if x == pivot]
+
+    right: list = [x for x in arr if x > pivot]
+
+    return quicksort(left) + mid + quicksort(right)
+
+
+
+quick_sort_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for quick_sort_len in length:
+
+    quick_sort_time_list = timeit.repeat(stmt='quicksort(arr)', setup='import random;'
+                                                                      'from __main__ import quicksort,quick_sort_len;'
+                                                                      'arr = [random.randint(0, 10000000)'
+                                                                      ' for i in range(quick_sort_len)]',
+                                         number=1, repeat=10)
+
+    quick_sort_time = numpy.mean(quick_sort_time_list)
+
+    quick_sort_time_result_list.append(quick_sort_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/经典排序/快速排序/快速排序时间数据", "w", encoding="utf-8") as f:
+    for x in quick_sort_time_result_list:
+        f.write(f"{x}\n")

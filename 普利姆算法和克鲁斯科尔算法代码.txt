@@ -1,0 +1,87 @@
+import networkx as nx
+import random
+import timeit
+import numpy
+
+
+
+def generate_random_weighted_graph(num, min_weight=1, max_weight=10):
+    G = nx.Graph()
+
+    for i in range(num):
+        G.add_node(i)
+
+    for i in range(num):
+        for j in range(i + 1, num):
+            weight = random.randint(min_weight, max_weight)
+            G.add_edge(i, j, weight=weight)
+    return G
+
+
+
+def prim_mst(graph):
+    mst = nx.Graph()
+    start_node = list(graph.nodes())[0]  # 选择一个起始节点
+    visited = {start_node}
+
+    while len(visited) < len(graph.nodes()):
+        min_edge = None
+        min_weight = float("inf")
+        for node in visited:
+            for neighbor, data in graph[node].items():
+                if neighbor not in visited and data['weight'] < min_weight:
+                    min_edge = (node, neighbor)
+                    min_weight = data['weight']
+        if min_edge:
+            u, v = min_edge
+            mst.add_edge(u, v, weight=min_weight)
+            visited.add(v)
+    return mst
+
+
+
+def kruskal_mst(graph):
+    mst = nx.Graph()
+    edges = sorted(graph.edges(data=True), key=lambda x: x[2]['weight'])
+    uf = nx.utils.UnionFind(graph.nodes())
+    # 随机路径赋值
+    for edge in edges:
+        u, v, data = edge
+        if uf[u] != uf[v]:
+            mst.add_edge(u, v, weight=data['weight'])
+            uf.union(u, v)
+
+    return mst
+
+
+
+prim_time_list_result_list = list()
+kruskal_time_list_result_list = list()
+
+length = [10, 50, 100, 250, 500, 750, 1000]
+
+for num_nodes in length:
+    random_graph = generate_random_weighted_graph(num_nodes, min_weight=20, max_weight=100000)
+
+    prim_time_list = timeit.repeat(stmt='prim_mst(random_graph)',
+                                   setup='from __main__ import random_graph,prim_mst',
+                                   number=1, repeat=5)
+
+    prim_time = numpy.mean(prim_time_list)
+
+    prim_time_list_result_list.append(prim_time * 1000)
+
+    kruskal_time_list = timeit.repeat(stmt='kruskal_mst(random_graph)',
+                                      setup='from __main__ import random_graph,kruskal_mst',
+                                      number=1, repeat=5)
+
+    kruskal_time = numpy.mean(kruskal_time_list)
+
+    kruskal_time_list_result_list.append(kruskal_time * 1000)
+
+with open("/个人算法可视化平台/图与树/树/克鲁斯卡尔算法时间数据", "w", encoding="utf-8") as f:
+    for x in kruskal_time_list_result_list:
+        f.write(f"{x}\n")
+with open("/个人算法可视化平台/图与树/树/普利姆算法时间数据", "w", encoding="utf-8") as f:
+    for x in prim_time_list_result_list:
+        f.write(f"{x}\n")

@@ -1,0 +1,45 @@
+import timeit
+import numpy
+
+
+def radix_sort(arr):
+
+    max_num = max(arr)
+    max_digit = len(str(max_num))
+
+
+    buckets = [[] for _ in range(10)]
+
+    for digit in range(max_digit):
+
+        for num in arr:
+            bucket_index = (num // 10 ** digit) % 10
+            buckets[bucket_index].append(num)
+
+        arr = [num for bucket in buckets for num in bucket]
+
+        buckets = [[] for _ in range(10)]
+
+    return arr
+
+
+
+radix_sort_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for radix_sort_len in length:
+
+    radix_sort_time_list = timeit.repeat(stmt='radix_sort(arr)', setup='import random;'
+                                                                       'from __main__ import radix_sort,radix_sort_len;'
+                                                                       'arr = [random.randint(0, 10000000)'
+                                                                       ' for i in range(radix_sort_len)]',
+                                         number=1, repeat=10)
+
+    radix_sort_time = numpy.mean(radix_sort_time_list)
+
+    radix_sort_time_result_list.append(radix_sort_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/经典排序/基数排序/基数排序时间数据", "w", encoding="utf-8") as f:
+    for x in radix_sort_time_result_list:
+        f.write(f"{x}\n")

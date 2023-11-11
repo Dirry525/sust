@@ -1,0 +1,22 @@
+import timeit
+import numpy
+
+
+tim_sort_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for tim_sort_len in length:
+
+    tim_sort_time_list = timeit.repeat(stmt='sorted(arr)',
+                                       setup='import random;from __main__ import tim_sort_len;'
+                                             'arr = [random.randint(0, 10000000)for i in range(tim_sort_len)]',
+                                       number=1, repeat=10)
+
+    tim_sort_time = numpy.mean(tim_sort_time_list)
+
+    tim_sort_time_result_list.append(tim_sort_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/经典排序/Tim排序/Tim排序时间数据", "w", encoding="utf-8") as f:
+    for x in tim_sort_time_result_list:
+        f.write(f"{x}\n")

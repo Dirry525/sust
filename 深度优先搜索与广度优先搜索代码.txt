@@ -1,0 +1,82 @@
+import random
+import timeit
+from collections import deque
+import numpy
+
+
+
+def generate_random_graph_graph(max_length):
+
+    graph = {i: [] for i in range(max_length)}
+
+    for i in range(max_length):
+        num_edges = random.randint(0, max_length - 1)
+        for _ in range(num_edges):
+            target_node = random.randint(0, max_length - 1)
+            if target_node != i and target_node not in graph[i]:
+                graph[i].append(target_node)
+
+    return graph
+
+
+
+def dfs(graph, start=1):
+
+    visited = set()
+    stack = [start]
+
+    while stack:
+        node = stack.pop()
+        if node not in visited:
+            visited.add(node)
+            stack.extend(neighbor for neighbor in graph[node] if neighbor not in visited)
+
+
+
+def bfs(graph, start=1):
+
+    visited = set()
+    queue = deque([start])
+    visited.add(start)
+
+    while queue:
+        node = queue.popleft()
+        for neighbor in graph[node]:
+            if neighbor not in visited:
+                queue.append(neighbor)
+                visited.add(neighbor)
+
+
+
+dfs_time_list_result_list = list()
+bfs_time_list_result_list = list()
+
+
+length = [10, 50, 100, 500, 1000, 5000, 10000]
+
+for num_nodes in length:
+
+    random_graph = generate_random_graph_graph(num_nodes)
+
+    bfs_time_list = timeit.repeat(stmt='bfs(random_graph)',
+                                  setup='from __main__ import random_graph,bfs',
+                                  number=1, repeat=5)
+
+    bfs_time = numpy.mean(bfs_time_list)
+    bfs_time_list_result_list.append(bfs_time * 1000)
+    # 每种数据规模测试5次
+    dfs_time_list = timeit.repeat(stmt='dfs(random_graph)',
+                                  setup='from __main__ import random_graph,dfs',
+                                  number=1, repeat=5)
+
+    dfs_time = numpy.mean(dfs_time_list)
+    dfs_time_list_result_list.append(dfs_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/图与树/图/广度优先时间数据", "w",
+          encoding="utf-8") as f:
+    for x in bfs_time_list_result_list:
+        f.write(f"{x}\n")
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/图与树/图/深度优先时间数据", "w",
+          encoding="utf-8") as f:
+    for x in dfs_time_list_result_list:
+        f.write(f"{x}\n")

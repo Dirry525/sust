@@ -1,0 +1,48 @@
+import random
+import timeit
+import numpy
+
+
+def create_hash_table(input_list):
+
+    table = {element: index for index, element in enumerate(input_list)}
+    return table
+
+
+def hash_search(table, target_value):
+
+    if target_value in table:
+        return table[target_value]
+    else:
+        return None
+
+
+
+hash_search_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for hash_search_len in length:
+
+    arr = [random.randint(0, 10000000) for i in range(hash_search_len)]
+
+    value_to_search = random.choice(arr)
+
+    hash_table = create_hash_table(arr)
+    value = arr[-1]
+
+    hash_search_time_list = timeit.repeat(stmt='hash_search(hash_table,value)',
+                                          setup='import random;'
+                                                'from __main__ import hash_search,hash_table,value,value_to_search;',
+                                          number=1, repeat=100)
+
+    hash_search_time_list = sorted(hash_search_time_list)[1:98:1]
+
+    hash_search_time = numpy.mean(hash_search_time_list)
+
+    hash_search_time_result_list.append(hash_search_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/查找算法/哈希查找/哈希查找时间数据", "w",
+          encoding="utf-8") as f:
+    for x in hash_search_time_result_list:
+        f.write(f"{x}\n")

@@ -1,0 +1,73 @@
+import timeit
+import numpy
+
+
+
+class TreeNode:
+    def __init__(self, value):
+        self.value = value
+        self.left = None
+        self.right = None
+
+
+
+def binary_tree_search(root, target_value):
+
+    if root is None:
+        return None
+
+    if root.value == target_value:
+        return root
+
+    if target_value < root.value:
+        return binary_tree_search(root.left, target_value)
+    else:
+
+        return binary_tree_search(root.right, target_value)
+
+
+
+def build_binary_tree(elements):
+
+    if not elements:
+        return None
+
+    elements.sort()
+
+    mid = len(elements) // 2
+
+    root = TreeNode(elements[mid])
+
+    root.left = build_binary_tree(elements[:mid])
+
+    root.right = build_binary_tree(elements[mid + 1:])
+
+    return root
+
+
+
+binary_tree_search_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for binary_tree_search_len in length:
+
+    binary_tree_search_time_list = timeit.repeat(stmt='binary_tree_search(tree_root,arr[-1])',
+                                                 setup='import random;from __main__ import binary_tree_search,TreeNode,'
+                                                       'binary_tree_search_len,build_binary_tree;'
+                                                       'arr = [random.randint(0, 10000000)for i in '
+                                                       'range(binary_tree_search_len)];'
+                                                       'value_to_search = random.choice(arr);'
+                                                       'tree_root=build_binary_tree(arr)',
+                                                 number=1, repeat=100)
+
+    binary_tree_search_time_list = sorted(binary_tree_search_time_list)[1:98:1]
+
+    binary_tree_search_time = numpy.mean(binary_tree_search_time_list)
+
+    binary_tree_search_time_result_list.append(binary_tree_search_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/查找算法/二叉树查找/二叉树查找时间数据", "w",
+          encoding="utf-8") as f:
+    for x in binary_tree_search_time_result_list:
+        f.write(f"{x}\n")

@@ -1,0 +1,61 @@
+import timeit
+import numpy
+
+
+def merge_sort(arr):
+    if len(arr) <= 1:
+        return arr
+
+
+    mid = len(arr) // 2
+    left_half = arr[:mid]
+    right_half = arr[mid:]
+
+
+    left_half = merge_sort(left_half)
+    right_half = merge_sort(right_half)
+
+
+    return merge(left_half, right_half)
+
+
+def merge(left, right):
+    result = []
+    left_idx, right_idx = 0, 0
+
+
+    while left_idx < len(left) and right_idx < len(right):
+        if left[left_idx] < right[right_idx]:
+            result.append(left[left_idx])
+            left_idx += 1
+        else:
+            result.append(right[right_idx])
+            right_idx += 1
+
+
+    result.extend(left[left_idx:])
+    result.extend(right[right_idx:])
+
+    return result
+
+
+
+merge_sort_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for merge_sort_len in length:
+
+    merge_sort_time_list = timeit.repeat(stmt='merge_sort(arr)', setup='import random;'
+                                                                       'from __main__ import merge,merge_sort,merge_sort_len;'
+                                                                       'arr = [random.randint(0, 10000000)'
+                                                                       ' for i in range(merge_sort_len)]',
+                                         number=1, repeat=10)
+
+    merge_sort_time = numpy.mean(merge_sort_time_list)
+
+    merge_sort_time_result_list.append(merge_sort_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/经典排序/归并排序/归并排序时间数据", "w", encoding="utf-8") as f:
+    for x in merge_sort_time_result_list:
+        f.write(f"{x}\n")

@@ -1,0 +1,43 @@
+import timeit
+import numpy
+
+
+def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+
+    while left <= right:
+        mid = (left + right) // 2
+
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+
+    return -1  
+
+
+
+binary_search_time_result_list = list()
+
+length = [1000, 10000, 50000, 100000, 500000, 1000000, 5000000, 10000000]
+
+for binary_search_len in length:
+
+    binary_search_time_list = timeit.repeat(stmt='binary_search(arr,arr[-1])',
+                                            setup='import random;from __main__ import binary_search,binary_search_len;'
+                                                  'arr = [random.randint(0, 10000000)for i in range(binary_search_len)];'
+                                                  'value_to_search = random.choice(arr)',
+                                            number=1, repeat=100)
+
+    binary_search_time_list = sorted(binary_search_time_list)[1:98:1]
+
+    binary_search_time = numpy.mean(binary_search_time_list)
+
+    binary_search_time_result_list.append(binary_search_time * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/查找算法/二分查找/二分查找时间数据", "w",
+          encoding="utf-8") as f:
+    for x in binary_search_time_result_list:
+        f.write(f"{x}\n")

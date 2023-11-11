@@ -1,0 +1,74 @@
+import networkx as nx
+import random
+import timeit
+import numpy
+
+
+def generate_random_graph(num, min_path_length, max_path_length):
+
+    G = nx.Graph()
+
+    for i in range(num):
+        G.add_node(i)
+
+    for i in range(num):
+        for j in range(i + 1, num):
+            weight = random.randint(min_path_length, max_path_length)  
+            G.add_edge(i, j, weight=weight)
+    return G
+
+
+def floyd_warshall_shortest_path(graph, source, target):
+
+    shortest_paths = nx.floyd_warshall(graph, weight='weight')
+
+
+    path_length = shortest_paths[source][target]
+
+
+def dijkstra_shortest_path(graph, source, target):
+
+    shortest_paths = nx.single_source_dijkstra_path_length(graph, source, weight='weight')
+
+
+    path_length = shortest_paths.get(target, float("inf"))
+
+
+length = [10, 50, 100, 200, 500, 1000]
+
+floyd_time_list_result_list = list()
+dijkstra_time_list_result_list = list()
+for num_nodes in length:
+
+    random_graph = generate_random_graph(num_nodes, min_path_length=20, max_path_length=100000)
+
+
+    floyd_time_list = timeit.repeat(stmt='floyd_warshall_shortest_path(random_graph)',
+                                    setup='from __main__ import random_graph,floyd_warshall_shortest_path;',
+
+                                    number=1, repeat=1)
+
+    floyd_time = numpy.mean(floyd_time_list)
+
+    floyd_time_list_result_list.append(floyd_time * 1000)
+
+
+
+    source_node = 0
+    target_node = num_nodes - 1
+    dijkstra_time_list = timeit.repeat(stmt='dijkstra_shortest_path(random_graph, source_node, target_node)',
+                                       setup='from __main__ import random_graph,dijkstra_shortest_path,'
+                                             'source_node, target_node;',
+
+                                       number=1, repeat=1)
+
+    dijkstra = numpy.mean(dijkstra_time_list)
+
+    dijkstra_time_list_result_list.append(dijkstra * 1000)
+
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/动态规划/迪杰斯特拉时间数据", "w", encoding="utf-8") as f:
+    for x in dijkstra_time_list_result_list:
+        f.write(f"{x}\n")
+with open("D:/Bin/aidenoiser_res/个人算法可视化平台/动态规划/弗洛依达时间数据", "w", encoding="utf-8") as f:
+    for x in floyd_time_list_result_list:
+        f.write(f"{x}\n")
